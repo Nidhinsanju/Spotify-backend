@@ -1,3 +1,5 @@
+require("dotenv").config(); // at the very top of your entry file
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -40,11 +42,14 @@ function verifyToken(req, res, next) {
   });
 }
 
-function generateToken(payload, expiresIn = "1h") {
-  if (!process.env.JWT_SECRET) {
-    throw new Error("JWT_SECRET is not defined in environment variables.");
-  }
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
+function generateToken(req, res, next) {
+  const token = jwt.sign(
+    { id: req.user._id, userName: req.user.userName },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" }
+  );
+  req.token = token;
+  next();
 }
 
 module.exports = {

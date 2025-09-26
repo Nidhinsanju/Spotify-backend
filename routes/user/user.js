@@ -3,7 +3,17 @@ const express = require("express");
 const router = express.Router();
 const User = require("../../DB/User");
 const bcrypt = require("bcrypt");
-const { verifyPassword } = require("../../middleware/index");
+const { verifyPassword, generateToken } = require("../../middleware/index");
+
+// Get the User details
+async function fetchUsers(user) {
+  const UserDetails = await User.findOne({ password: user });
+  const responseDetails = {
+    userName: UserDetails?.userName,
+    ID: UserDetails?.ID,
+  };
+  return responseDetails;
+}
 
 // Example: GET /api/users
 router.get("/", async (req, res) => {
@@ -37,9 +47,19 @@ router.post(
     next();
   },
   verifyPassword,
-  (req, res) => {
-    // If we reach here, password is valid
-    res.status(200).json({ message: "Login successful", user: res.user });
+  generateToken,
+  async (req, res) => {
+    try {
+      const extraUserData = await fetchUsers(req.user);
+      return res.status(200).json({
+        message: "Login successful",
+        data: extraUserData,
+        token: req.token,
+      });
+    } catch (err) {
+      console.log(err, "this is error");
+      return res.status(500).json({ message: "Something went wrong" });
+    }
   }
 );
 
