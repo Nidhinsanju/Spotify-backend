@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const app = express();
 const PORT = 5000; // you can change the port
 const usersRouter = require("./routes/user/user");
-const connectDB = require("./routes/user/DB");
+const connectDB = require("./DB/index");
 require("dotenv").config(); // add this at the very top
 
 // Middleware to parse JSON
