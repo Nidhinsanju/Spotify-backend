@@ -65,11 +65,11 @@ router.post(
 
 // Example: POST /api/users
 router.post("/create-user", async (req, res) => {
-  const { userName, password } = req.body; // expects JSON { name: "Charlie" }
+  const { email, password, userName } = req.body; // expects JSON { name: "Charlie" }
   try {
     // Generate a 2-digit string ID
     const randomID = String(Math.floor(Math.random() * 100)).padStart(2, "0");
-    const existingUser = await User.findOne({ userName: userName });
+    const existingUser = await User.findOne({ emailAdres: email });
     if (existingUser) {
       return res.status(409).json({ message: "UserName already Exisis" });
     }
@@ -82,6 +82,7 @@ router.post("/create-user", async (req, res) => {
       ID: randomID,
       userName,
       password: hashedPassword,
+      email,
     });
 
     res.status(201).json({ message: "User created", Data: newUser });
