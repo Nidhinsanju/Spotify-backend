@@ -37,7 +37,7 @@ router.post(
     if (!userName || !password) {
       res.status(401).json({ message: "Invalid Credentails" });
     }
-    const user = await User.findOne({ userName });
+    const user = await User.findOne({ email: userName });
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -69,7 +69,7 @@ router.post("/create-user", async (req, res) => {
   try {
     // Generate a 2-digit string ID
     const randomID = String(Math.floor(Math.random() * 100)).padStart(2, "0");
-    const existingUser = await User.findOne({ emailAdres: email });
+    const existingUser = await User.findOne({ email: email });
     if (existingUser) {
       return res.status(409).json({ message: "UserName already Exisis" });
     }
@@ -78,14 +78,14 @@ router.post("/create-user", async (req, res) => {
     const hashedPassword = await bcrypt.hash(String(password), saltRounds);
 
     // Save user with hashed password
-    const newUser = await User.create({
+    const createNewUser = await User.create({
       ID: randomID,
       userName,
       password: hashedPassword,
       email,
     });
 
-    res.status(201).json({ message: "User created", Data: newUser });
+    res.status(201).json({ message: "User created", Data: createNewUser });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error" });
